@@ -6,6 +6,7 @@ export const toyResolvers = {
     toys: () => toyService.query(),
     toy: (_: unknown, args: SingleToyArgs) => toyService.getById(args._id),
   },
+
   Mutation: {
     removeToy: (_: unknown, args: SingleToyArgs) => {
       const updatedToys = toyService.remove(args._id)
