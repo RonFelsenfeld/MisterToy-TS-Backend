@@ -1,8 +1,8 @@
-import { utilService } from './services/util.service'
-import { NewToyArgs, SingleToyArgs, Toy, UpdateToyArgs } from './data/models/toy.model'
-import { db } from './data/demo-data'
+import { utilService } from '../../services/util.service'
+import { NewToyArgs, SingleToyArgs, Toy, UpdateToyArgs } from '../../data/models/toy.model'
+import { db } from '../../data/demo-data'
 
-export const resolvers = {
+export const toyResolvers = {
   Query: {
     toys: () => db.toys,
     toy: (_: unknown, args: SingleToyArgs) => db.toys.find(t => t._id === args._id),

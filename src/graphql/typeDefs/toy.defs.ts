@@ -1,4 +1,4 @@
-export const typeDefs = `#graphql
+export const toyDefs = `#graphql
 type Toy{
   _id: ID,
   name: String!,

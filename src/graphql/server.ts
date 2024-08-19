@@ -1,10 +1,8 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import { schema } from './schema'
 
-import { typeDefs } from './schema'
-import { resolvers } from './resolvers'
-
-const server = new ApolloServer({ typeDefs, resolvers })
+const server = new ApolloServer(schema)
 
 initServer()
 async function initServer() {
