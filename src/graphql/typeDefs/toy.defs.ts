@@ -1,5 +1,5 @@
 export const toyDefs = `#graphql
-type Toy{
+type Toy {
   _id: ID,
   name: String!,
   price: Float!,
@@ -9,14 +9,27 @@ type Toy{
 }
 
 type Query {
-  toys: [Toy]
+  toys(filterBy: FilterByInput!, sortBy: SortByInput): [Toy]
   toy(_id: ID!): Toy
 }
 
 type Mutation {
   removeToy(_id: ID!): [Toy]
   addToy(toy: AddToyInput!): Toy
-  updateToy(_id: ID!, updates: UpdateToyInput!): Toy
+  updateToy(toy: UpdateToyInput!): Toy
+}
+
+input FilterByInput {
+  name: String!
+  inStock: Boolean
+  maxPrice: Float!
+  labels: [String!]!
+}
+
+input SortByInput {
+  name: Int
+  price: Int
+  createdAt: Int
 }
 
 input AddToyInput {
@@ -27,9 +40,11 @@ input AddToyInput {
 }
 
 input UpdateToyInput {
-  name: String,
-  price: Float,
-  labels: [String!]
-  inStock: Boolean
+  _id: ID!,
+  name: String!,
+  price: Float!,
+  labels: [String!]!,
+  createdAt: String!,
+  inStock: Boolean!
 }
 `

@@ -7,15 +7,14 @@ export interface Toy {
   inStock: boolean
 }
 
-export interface SingleToyArgs {
-  _id: string
+export interface ToyFilterBy {
+  name: string
+  inStock: boolean | null
+  maxPrice: number
+  labels: string[]
 }
-
-export interface NewToyArgs {
-  toy: Partial<Toy>
-}
-
-export interface UpdateToyArgs {
-  _id: string
-  updates: Partial<Toy>
+export interface ToySortBy {
+  name?: 1 | -1
+  price?: 1 | -1
+  createdAt?: 1 | -1
 }
