@@ -1,28 +1,23 @@
-import { utilService } from '../../services/util.service'
-import { NewToyArgs, SingleToyArgs, Toy, UpdateToyArgs } from '../../data/models/toy.model'
-import { db } from '../../data/demo-data'
+import { toyService } from '../../services/toy.service'
+import { NewToyArgs, SingleToyArgs, UpdateToyArgs } from '../../data/models/toy.model'
 
 export const toyResolvers = {
   Query: {
-    toys: () => db.toys,
-    toy: (_: unknown, args: SingleToyArgs) => db.toys.find(t => t._id === args._id),
+    toys: () => toyService.query(),
+    toy: (_: unknown, args: SingleToyArgs) => toyService.getById(args._id),
   },
   Mutation: {
     removeToy: (_: unknown, args: SingleToyArgs) => {
-      db.toys = db.toys.filter(t => t._id !== args._id)
-      return db.toys
+      const updatedToys = toyService.remove(args._id)
+      return updatedToys
     },
     addToy(_: unknown, { toy }: NewToyArgs) {
-      const newToy = { ...toy, _id: utilService.makeId(), createdAt: Date.now() }
-      db.toys.push(newToy as Toy)
+      const newToy = toyService.add(toy)
       return newToy
     },
     updateToy: (_: unknown, { _id, updates }: UpdateToyArgs) => {
-      db.toys = db.toys.map(t => {
-        if (t._id === _id) return { ...t, ...updates }
-        return t
-      })
-      return db.toys.find(t => t._id === _id)
+      const updatedToy = toyService.update(_id, updates)
+      return updatedToy
     },
   },
 }
