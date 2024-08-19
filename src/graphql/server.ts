@@ -8,6 +8,7 @@ import bodyParser from 'body-parser'
 import path from 'path'
 
 import { schema } from './schema'
+import { logger } from '../services/logger.service'
 
 const app = express()
 const httpServer = http.createServer(app)
@@ -41,6 +42,7 @@ async function initServer() {
   app.use(bodyParser.json())
   app.use(expressMiddleware(server))
 
-  httpServer.listen({ port: 4000 })
-  console.log(`🚀 Server ready at http://localhost:4000`)
+  const port = process.env.PORT || 4000
+  httpServer.listen({ port })
+  logger.info(`Server ready at http://localhost:${port}`)
 }
