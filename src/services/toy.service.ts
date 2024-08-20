@@ -1,7 +1,7 @@
-import { db } from '../data/demo-data'
-import { Toy, ToyFilterBy, ToySortBy } from '../data/models/toy.model'
+import fs from 'fs'
 import { logger } from './logger.service'
 import { utilService } from './util.service'
+import { Toy, ToyFilterBy, ToySortBy } from '../data/models/toy.model'
 
 export const toyService = {
   query,
@@ -11,19 +11,21 @@ export const toyService = {
   update,
 }
 
+let toys: Toy[] = utilService.readJsonFile('data/toy.json')
+
 function query(filterBy: ToyFilterBy, sortBy: ToySortBy) {
   logger.debug('Querying toys')
-  let toys = db.toys.slice()
+  let toysToReturn = toys.slice()
 
-  toys = _filterToys(toys, filterBy)
-  toys = _sortToys(toys, sortBy)
+  toysToReturn = _filterToys(toysToReturn, filterBy)
+  toysToReturn = _sortToys(toysToReturn, sortBy)
 
-  return toys
+  return toysToReturn
 }
 
 function getById(toyId: string) {
   logger.debug('Fetching toy with ID:', toyId)
-  const toy = db.toys.find(t => t._id === toyId)
+  const toy = toys.find(t => t._id === toyId)
 
   if (!toy) {
     logger.warn('Toy not found')
@@ -33,38 +35,55 @@ function getById(toyId: string) {
   return toy
 }
 
-function remove(toyId: string) {
+async function remove(toyId: string) {
   logger.debug('Removing toy with ID:', toyId)
-  const toyIdx = db.toys.findIndex(t => t._id === toyId)
+  const toyIdx = toys.findIndex(t => t._id === toyId)
 
   if (toyIdx < 0) {
     logger.warn('Toy not found')
     throw new Error('Toy not found')
   }
 
-  db.toys.splice(toyIdx, 1)
-  return db.toys
+  toys.splice(toyIdx, 1)
+  const updatedToys = await _saveToysToFile()
+  return updatedToys
 }
 
-function add(toy: Partial<Toy>) {
+async function add(toy: Partial<Toy>) {
   logger.debug('Adding new toy:', toy)
 
   toy._id = utilService.makeId()
   toy.createdAt = Date.now()
-  db.toys.push(toy as Toy)
 
-  return toy as Toy
+  toys.push(toy as Toy)
+  await _saveToysToFile()
+  return toy
 }
 
-function update(toy: Toy) {
+async function update(toy: Toy) {
   logger.debug('Updating toy with ID:', toy._id)
-  db.toys = db.toys.map(t => (t._id === toy._id ? toy : t))
+
+  toys = toys.map(t => (t._id === toy._id ? toy : t))
+  await _saveToysToFile()
   return toy
 }
 
 ////////////////////////////////////////////////////
 
 // ! Private Methods
+
+function _saveToysToFile() {
+  return new Promise<Toy[]>((resolve, reject) => {
+    const data = JSON.stringify(toys, null, 2)
+    fs.writeFile('data/toy.json', data, err => {
+      if (err) {
+        console.log(err)
+        return reject(err)
+      }
+      resolve(toys)
+    })
+  })
+}
 
 function _filterToys(toys: Toy[], filterBy: ToyFilterBy) {
   logger.debug('Filtering toys from BACKEND:', filterBy)

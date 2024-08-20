@@ -1,5 +1,8 @@
+import fs from 'fs'
+
 export const utilService = {
   makeId,
+  readJsonFile,
 }
 
 function makeId(length: number = 6) {
@@ -11,4 +14,10 @@ function makeId(length: number = 6) {
   }
 
   return txt
+}
+
+function readJsonFile(path: string) {
+  const str = fs.readFileSync(path, 'utf8')
+  const json = JSON.parse(str)
+  return json
 }

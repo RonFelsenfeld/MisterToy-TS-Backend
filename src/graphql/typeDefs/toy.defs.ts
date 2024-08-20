@@ -4,7 +4,7 @@ type Toy {
   name: String!,
   price: Float!,
   labels: [String!]!,
-  createdAt: String!,
+  createdAt: Float!,
   inStock: Boolean!
 }
 
@@ -44,7 +44,7 @@ input UpdateToyInput {
   name: String!,
   price: Float!,
   labels: [String!]!,
-  createdAt: String!,
+  createdAt: Float!,
   inStock: Boolean!
 }
 `
