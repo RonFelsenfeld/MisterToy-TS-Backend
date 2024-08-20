@@ -1,29 +1,57 @@
+import { logger } from '../../services/logger.service'
 import { toyService } from '../../services/toy.service'
-import { SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../data/models/resolversArgs.model'
+
 import { Toy } from '../../data/models/toy.model'
+import { SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../data/models/resolversArgs.model'
 
 export const toyResolvers = {
   Query: {
-    toys(_: unknown, { filterBy, sortBy }: QueryToysArgs) {
-      return toyService.query(filterBy, sortBy)
+    async toys(_: unknown, { filterBy, sortBy }: QueryToysArgs) {
+      try {
+        const toys = await toyService.query(filterBy, sortBy)
+        return toys
+      } catch (err) {
+        console.log('Had issues with loading toys:', err)
+        logger.error(err)
+      }
     },
-    toy(_: unknown, args: SingleToyArgs) {
-      return toyService.getById(args._id)
+    async toy(_: unknown, args: SingleToyArgs) {
+      try {
+        const toy = await toyService.getById(args._id)
+        return toy
+      } catch (err) {
+        console.log('Had issues with loading toy:', err)
+        logger.error(err)
+      }
     },
   },
 
   Mutation: {
-    removeToy(_: unknown, { _id }: SingleToyArgs) {
-      const updatedToys = toyService.remove(_id)
-      return updatedToys
+    async removeToy(_: unknown, { _id }: SingleToyArgs) {
+      try {
+        await toyService.remove(_id)
+      } catch (err) {
+        console.log('Had issues with removing toy:', err)
+        logger.error(err)
+      }
     },
-    addToy(_: unknown, { toy }: SaveToyArgs) {
-      const newToy = toyService.add(toy)
-      return newToy
+    async addToy(_: unknown, { toy }: SaveToyArgs) {
+      try {
+        const newToy = await toyService.add(toy)
+        return newToy
+      } catch (err) {
+        console.log('Had issues with adding toy:', err)
+        logger.error(err)
+      }
     },
-    updateToy(_: unknown, { toy }: SaveToyArgs) {
-      const updatedToy = toyService.update(toy as Toy)
-      return updatedToy
+    async updateToy(_: unknown, { toy }: SaveToyArgs) {
+      try {
+        const updatedToy = await toyService.update(toy as Toy)
+        return updatedToy
+      } catch (err) {
+        console.log('Had issues with updating toy:', err)
+        logger.error(err)
+      }
     },
   },
 }

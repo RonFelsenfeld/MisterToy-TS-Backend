@@ -13,17 +13,17 @@ export const toyService = {
 
 let toys: Toy[] = utilService.readJsonFile('data/toy.json')
 
-function query(filterBy: ToyFilterBy, sortBy: ToySortBy) {
+async function query(filterBy: ToyFilterBy, sortBy: ToySortBy) {
   logger.debug('Querying toys')
   let toysToReturn = toys.slice()
 
   toysToReturn = _filterToys(toysToReturn, filterBy)
   toysToReturn = _sortToys(toysToReturn, sortBy)
 
-  return toysToReturn
+  return Promise.resolve(toysToReturn)
 }
 
-function getById(toyId: string) {
+async function getById(toyId: string) {
   logger.debug('Fetching toy with ID:', toyId)
   const toy = toys.find(t => t._id === toyId)
 
@@ -32,7 +32,7 @@ function getById(toyId: string) {
     throw new Error('Toy not found')
   }
 
-  return toy
+  return Promise.resolve(toy)
 }
 
 async function remove(toyId: string) {
@@ -45,8 +45,7 @@ async function remove(toyId: string) {
   }
 
   toys.splice(toyIdx, 1)
-  const updatedToys = await _saveToysToFile()
-  return updatedToys
+  await _saveToysToFile()
 }
 
 async function add(toy: Partial<Toy>) {
@@ -73,14 +72,14 @@ async function update(toy: Toy) {
 // ! Private Methods
 
 function _saveToysToFile() {
-  return new Promise<Toy[]>((resolve, reject) => {
-    const data = JSON.stringify(toys, null, 2)
+  return new Promise<void>((resolve, reject) => {
+    const data = JSON.stringify(toys, null, 4)
     fs.writeFile('data/toy.json', data, err => {
       if (err) {
         console.log(err)
         return reject(err)
       }
-      resolve(toys)
+      resolve()
     })
   })
 }

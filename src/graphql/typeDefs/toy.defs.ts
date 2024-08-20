@@ -1,6 +1,6 @@
 export const toyDefs = `#graphql
 type Toy {
-  _id: ID,
+  _id: ID!,
   name: String!,
   price: Float!,
   labels: [String!]!,
@@ -14,7 +14,7 @@ type Query {
 }
 
 type Mutation {
-  removeToy(_id: ID!): [Toy]
+  removeToy(_id: ID!): Boolean
   addToy(toy: AddToyInput!): Toy
   updateToy(toy: UpdateToyInput!): Toy
 }
