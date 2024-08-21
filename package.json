@@ -4,8 +4,8 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/graphql/server.js",
-    "dev": "nodemon src/graphql/server.ts"
+    "start": "node dist/server.js",
+    "dev": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",

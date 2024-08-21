@@ -7,8 +7,8 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import { schema } from './schema'
-import { logger } from '../services/logger.service'
+import { schema } from './graphql/schema'
+import { logger } from './services/logger.service'
 
 const app = express()
 const httpServer = http.createServer(app)
