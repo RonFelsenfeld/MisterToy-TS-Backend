@@ -9,6 +9,6 @@ export interface SaveToyArgs {
 }
 
 export interface QueryToysArgs {
-  filterBy: ToyFilterBy
-  sortBy: ToySortBy
+  filterBy?: ToyFilterBy
+  sortBy?: ToySortBy
 }

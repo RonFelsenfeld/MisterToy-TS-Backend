@@ -9,7 +9,7 @@ type Toy {
 }
 
 type Query {
-  toys(filterBy: FilterByInput!, sortBy: SortByInput): [Toy]
+  toys(filterBy: FilterByInput, sortBy: SortByInput): [Toy]
   toy(_id: ID!): Toy
 }
 

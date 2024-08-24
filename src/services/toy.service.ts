@@ -13,12 +13,12 @@ export const toyService = {
 
 let toys: Toy[] = utilService.readJsonFile('data/toy.json')
 
-async function query(filterBy: ToyFilterBy, sortBy: ToySortBy) {
+async function query(filterBy?: ToyFilterBy, sortBy?: ToySortBy) {
   logger.debug('Querying toys')
   let toysToReturn = toys.slice()
 
-  toysToReturn = _filterToys(toysToReturn, filterBy)
-  toysToReturn = _sortToys(toysToReturn, sortBy)
+  if (filterBy) toysToReturn = _filterToys(toysToReturn, filterBy)
+  if (sortBy) toysToReturn = _sortToys(toysToReturn, sortBy)
 
   return Promise.resolve(toysToReturn)
 }
