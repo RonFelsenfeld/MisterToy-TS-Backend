@@ -1,4 +1,4 @@
 export interface DBConfig {
   dbURL: string
-  dbName: string
+  dbName: 'MisterToyDB'
 }
