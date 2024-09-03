@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { logger } from './logger.service'
 import { utilService } from './util.service'
-import { Toy, ToyFilterBy, ToySortBy } from '../data/models/toy.model'
+import { Toy, ToyFilterBy, ToySortBy } from '../models/toy.model'
 
 export const toyService = {
   query,

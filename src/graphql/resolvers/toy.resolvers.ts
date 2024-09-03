@@ -1,8 +1,8 @@
 import { logger } from '../../services/logger.service'
 import { toyService } from '../../services/toy.service'
 
-import { Toy } from '../../data/models/toy.model'
-import { SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../data/models/resolversArgs.model'
+import { Toy } from '../../models/toy.model'
+import { SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../models/resolversArgs.model'
 
 export const toyResolvers = {
   Query: {
