@@ -1,6 +1,7 @@
-import fs from 'fs'
+import { ObjectId } from 'mongodb'
+
 import { logger } from './logger.service'
-import { utilService } from './util.service'
+import { dbService } from './db.service'
 import { Toy, ToyFilterBy, ToySortBy } from '../models/toy.model'
 
 export const toyService = {
@@ -11,78 +12,94 @@ export const toyService = {
   update,
 }
 
-let toys: Toy[] = utilService.readJsonFile('data/toy.json')
+const toysCollectionName = process.env.TOYS_COLLECTION_NAME!
 
 async function query(filterBy?: ToyFilterBy, sortBy?: ToySortBy) {
   logger.debug('Querying toys')
-  let toysToReturn = toys.slice()
 
-  if (filterBy) toysToReturn = _filterToys(toysToReturn, filterBy)
-  if (sortBy) toysToReturn = _sortToys(toysToReturn, sortBy)
+  try {
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    let toys = await collection.find().toArray()
 
-  return Promise.resolve(toysToReturn)
+    // TODO: Filter and sort using MongoDB
+    if (filterBy) toys = _filterToys(toys, filterBy)
+    if (sortBy) toys = _sortToys(toys, sortBy)
+
+    return toys
+  } catch (err) {
+    logger.error('Cannot fetch toys', err)
+    throw err
+  }
 }
 
 async function getById(toyId: string) {
-  logger.debug('Fetching toy with ID:', toyId)
-  const toy = toys.find(t => t._id === toyId)
+  logger.debug(`Fetching toy with ID: ${toyId}`)
 
-  if (!toy) {
-    logger.warn('Toy not found')
-    throw new Error('Toy not found')
+  try {
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    const toy = collection.findOne({ _id: new ObjectId(toyId) })
+    return toy
+  } catch (err) {
+    logger.error(`Cannot fetch toy with ID: ${toyId}`, err)
+    throw err
   }
-
-  return Promise.resolve(toy)
 }
 
 async function remove(toyId: string) {
-  logger.debug('Removing toy with ID:', toyId)
-  const toyIdx = toys.findIndex(t => t._id === toyId)
+  logger.debug(`Removing toy with ID: ${toyId}`)
 
-  if (toyIdx < 0) {
-    logger.warn('Toy not found')
-    throw new Error('Toy not found')
+  try {
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    await collection.deleteOne({ _id: new ObjectId(toyId) })
+  } catch (err) {
+    logger.error(`Cannot remove toy ${toyId}`, err)
+    throw err
   }
-
-  toys.splice(toyIdx, 1)
-  await _saveToysToFile()
 }
 
 async function add(toy: Partial<Toy>) {
   logger.debug('Adding new toy:', toy)
 
-  toy._id = utilService.makeId()
-  toy.createdAt = Date.now()
+  try {
+    const collection = await dbService.getCollection('toys')
+    await collection.insertOne(toy)
 
-  toys.push(toy as Toy)
-  await _saveToysToFile()
-  return toy
+    const toyId = new ObjectId(toy._id)
+    // TODO: Add createdAt based on _id
+    // toy.createdAt = toyId.getTimestamp()
+
+    toy.createdAt = Date.now()
+    await collection.updateOne({ _id: new ObjectId(toyId) }, { $set: toy })
+    return toy
+  } catch (err) {
+    logger.error('cannot insert toy', err)
+    throw err
+  }
 }
 
 async function update(toy: Toy) {
-  logger.debug('Updating toy with ID:', toy._id)
+  logger.debug(`Updating toy with ID: ${toy._id}`)
 
-  toys = toys.map(t => (t._id === toy._id ? toy : t))
-  await _saveToysToFile()
-  return toy
+  try {
+    const toyToSave = {
+      name: toy.name,
+      price: toy.price,
+      inStock: toy.inStock,
+      labels: [...toy.labels],
+    }
+
+    const collection = await dbService.getCollection(toysCollectionName)
+    await collection.updateOne({ _id: new ObjectId(toy._id) }, { $set: toyToSave })
+    return toy
+  } catch (err) {
+    logger.error(`Cannot update toy ${toy._id}`, err)
+    throw err
+  }
 }
 
 ////////////////////////////////////////////////////
 
 // ! Private Methods
-
-function _saveToysToFile() {
-  return new Promise<void>((resolve, reject) => {
-    const data = JSON.stringify(toys, null, 4)
-    fs.writeFile('data/toy.json', data, err => {
-      if (err) {
-        console.log(err)
-        return reject(err)
-      }
-      resolve()
-    })
-  })
-}
 
 function _filterToys(toys: Toy[], filterBy: ToyFilterBy) {
   logger.debug('Filtering toys from BACKEND:', filterBy)

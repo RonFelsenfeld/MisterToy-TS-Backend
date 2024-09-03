@@ -13,6 +13,8 @@ async function getCollection<T extends Document>(collectionName: string): Promis
   try {
     const db = await connectToDB()
     const collection = db.collection<T>(collectionName)
+
+    logger.info(`Connected to MongoDB and fetched collection: ${collectionName}`)
     return collection
   } catch (err) {
     logger.error('Failed to get Mongo collection:', err)
