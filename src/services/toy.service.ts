@@ -1,8 +1,8 @@
-import { Filter, ObjectId } from 'mongodb'
+import { Filter, ObjectId, Sort } from 'mongodb'
 
 import { logger } from './logger.service'
 import { dbService } from './db.service'
-import { Toy, ToyFilterBy, ToySortBy } from '../models/toy.model'
+import { Toy, ToyFilterBy } from '../models/toy.model'
 
 export const toyService = {
   query,
@@ -14,18 +14,14 @@ export const toyService = {
 
 const toysCollectionName = process.env.TOYS_COLLECTION_NAME!
 
-async function query(filterBy?: ToyFilterBy, sortBy?: ToySortBy) {
+async function query(filterBy?: ToyFilterBy, sortBy: Sort = {}) {
   logger.debug('Querying toys')
 
   try {
     const filterCriteria = _getFilterCriteria(filterBy)
 
     const collection = await dbService.getCollection<Toy>(toysCollectionName)
-    let toys = await collection.find(filterCriteria).toArray()
-    // TODO: Filter and sort using MongoDB
-
-    // if (filterBy) toys = _filterToys(toys, filterBy)
-    if (sortBy) toys = _sortToys(toys, sortBy)
+    let toys = await collection.find(filterCriteria).sort(sortBy).toArray()
 
     return toys
   } catch (err) {
@@ -113,46 +109,4 @@ function _getFilterCriteria(filterBy?: ToyFilterBy): Filter<Toy> {
   if (labels.length) filterCriteria.labels = { $all: labels }
 
   return filterCriteria
-}
-
-// function _filterToys(toys: Toy[], filterBy: ToyFilterBy) {
-//   logger.debug('Filtering toys from BACKEND:', filterBy)
-//   const { name, inStock, maxPrice, labels } = filterBy
-//   let toysToReturn = toys.slice()
-
-//   if (name) {
-//     const regExp = new RegExp(name, 'i')
-//     toysToReturn = toysToReturn.filter(t => regExp.test(t.name))
-//   }
-
-//   if (inStock !== null) {
-//     toysToReturn = toysToReturn.filter(t => t.inStock === inStock)
-//   }
-
-//   if (maxPrice) {
-//     toysToReturn = toysToReturn.filter(t => t.price <= maxPrice)
-//   }
-
-//   if (labels.length) {
-//     toysToReturn = toysToReturn.filter(t => t.labels.some(l => labels.includes(l)))
-//   }
-
-//   return toysToReturn
-// }
-
-function _sortToys(toys: Toy[], sortBy: ToySortBy) {
-  logger.debug('Sorting toys from BACKEND:', sortBy)
-  if (sortBy.name) {
-    toys = toys.sort((t1, t2) => t1.name.localeCompare(t2.name) * sortBy.name!)
-  }
-
-  if (sortBy.price) {
-    toys = toys.sort((t1, t2) => (t1.price - t2.price) * sortBy.price!)
-  }
-
-  if (sortBy.createdAt) {
-    toys = toys.sort((t1, t2) => (t2.createdAt - t1.createdAt) * sortBy.createdAt!)
-  }
-
-  return toys
 }

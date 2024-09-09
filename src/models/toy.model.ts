@@ -15,9 +15,3 @@ export interface ToyFilterBy {
   maxPrice: number
   labels: string[]
 }
-
-export interface ToySortBy {
-  name?: 1 | -1
-  price?: 1 | -1
-  createdAt?: 1 | -1
-}
