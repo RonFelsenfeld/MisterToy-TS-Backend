@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { Filter, ObjectId } from 'mongodb'
 
 import { logger } from './logger.service'
 import { dbService } from './db.service'
@@ -18,11 +18,13 @@ async function query(filterBy?: ToyFilterBy, sortBy?: ToySortBy) {
   logger.debug('Querying toys')
 
   try {
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
-    let toys = await collection.find().toArray()
+    const filterCriteria = _getFilterCriteria(filterBy)
 
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    let toys = await collection.find(filterCriteria).toArray()
     // TODO: Filter and sort using MongoDB
-    if (filterBy) toys = _filterToys(toys, filterBy)
+
+    // if (filterBy) toys = _filterToys(toys, filterBy)
     if (sortBy) toys = _sortToys(toys, sortBy)
 
     return toys
@@ -61,14 +63,12 @@ async function add(toy: Partial<Toy>) {
   logger.debug('Adding new toy:', toy)
 
   try {
-    const collection = await dbService.getCollection('toys')
-    await collection.insertOne(toy)
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    await collection.insertOne(toy as Toy)
 
     const toyId = new ObjectId(toy._id)
-    // TODO: Add createdAt based on _id
-    // toy.createdAt = toyId.getTimestamp()
+    toy.createdAt = toyId.getTimestamp().getTime()
 
-    toy.createdAt = Date.now()
     await collection.updateOne({ _id: new ObjectId(toyId) }, { $set: toy })
     return toy
   } catch (err) {
@@ -88,7 +88,7 @@ async function update(toy: Toy) {
       labels: [...toy.labels],
     }
 
-    const collection = await dbService.getCollection(toysCollectionName)
+    const collection = await dbService.getCollection<Toy>(toysCollectionName)
     await collection.updateOne({ _id: new ObjectId(toy._id) }, { $set: toyToSave })
     return toy
   } catch (err) {
@@ -101,30 +101,44 @@ async function update(toy: Toy) {
 
 // ! Private Methods
 
-function _filterToys(toys: Toy[], filterBy: ToyFilterBy) {
-  logger.debug('Filtering toys from BACKEND:', filterBy)
+function _getFilterCriteria(filterBy?: ToyFilterBy): Filter<Toy> {
+  if (!filterBy) return {}
+
+  const filterCriteria: Filter<Toy> = {}
   const { name, inStock, maxPrice, labels } = filterBy
-  let toysToReturn = toys.slice()
 
-  if (name) {
-    const regExp = new RegExp(name, 'i')
-    toysToReturn = toysToReturn.filter(t => regExp.test(t.name))
-  }
+  if (name) filterCriteria.name = { $regex: name, $options: 'i' }
+  if (inStock !== null) filterCriteria.inStock = inStock
+  if (maxPrice) filterCriteria.price = { $lte: +maxPrice }
+  if (labels.length) filterCriteria.labels = { $all: labels }
 
-  if (inStock !== null) {
-    toysToReturn = toysToReturn.filter(t => t.inStock === inStock)
-  }
-
-  if (maxPrice) {
-    toysToReturn = toysToReturn.filter(t => t.price <= maxPrice)
-  }
-
-  if (labels.length) {
-    toysToReturn = toysToReturn.filter(t => t.labels.some(l => labels.includes(l)))
-  }
-
-  return toysToReturn
+  return filterCriteria
 }
+
+// function _filterToys(toys: Toy[], filterBy: ToyFilterBy) {
+//   logger.debug('Filtering toys from BACKEND:', filterBy)
+//   const { name, inStock, maxPrice, labels } = filterBy
+//   let toysToReturn = toys.slice()
+
+//   if (name) {
+//     const regExp = new RegExp(name, 'i')
+//     toysToReturn = toysToReturn.filter(t => regExp.test(t.name))
+//   }
+
+//   if (inStock !== null) {
+//     toysToReturn = toysToReturn.filter(t => t.inStock === inStock)
+//   }
+
+//   if (maxPrice) {
+//     toysToReturn = toysToReturn.filter(t => t.price <= maxPrice)
+//   }
+
+//   if (labels.length) {
+//     toysToReturn = toysToReturn.filter(t => t.labels.some(l => labels.includes(l)))
+//   }
+
+//   return toysToReturn
+// }
 
 function _sortToys(toys: Toy[], sortBy: ToySortBy) {
   logger.debug('Sorting toys from BACKEND:', sortBy)
