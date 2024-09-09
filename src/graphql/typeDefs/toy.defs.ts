@@ -1,10 +1,10 @@
 export const toyDefs = `#graphql
 type Toy {
-  _id: ID!,
-  name: String!,
-  price: Float!,
-  labels: [String!]!,
-  createdAt: Float!,
+  _id: ID!
+  name: String!
+  price: Float!
+  labels: [String!]!
+  createdAt: Float!
   inStock: Boolean!
 }
 

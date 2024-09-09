@@ -35,9 +35,10 @@ const server = new ApolloServer({
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 })
 
-app.get('/**', (_, res) => {
-  res.sendFile(path.resolve('public/index.html'))
-})
+// ! Activate on build
+// app.get('/**', (_, res) => {
+//   res.sendFile(path.resolve('public/index.html'))
+// })
 
 initServer()
 async function initServer() {
