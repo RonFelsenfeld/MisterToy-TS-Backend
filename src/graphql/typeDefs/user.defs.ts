@@ -7,11 +7,18 @@ type User {
 }
 
 type Mutation {
-  login(credentials: LoginUserInput!): Boolean
+  login(credentials: LoginInput!): Boolean
+  signup(credentials:  SignupInput!): Boolean
 }
 
-input LoginUserInput {
+input LoginInput {
   username: String!
   password: String!
+ }
+
+ input SignupInput {
+  username: String!
+  password: String!
+  fullName: String!
  }
 `

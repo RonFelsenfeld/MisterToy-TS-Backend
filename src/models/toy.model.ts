@@ -1,5 +1,7 @@
 import { ObjectId, Sort } from 'mongodb'
 
+// TODO: Refactor interfaces
+
 export interface Toy {
   _id: ObjectId
   name: string
