@@ -1,7 +1,7 @@
-import { UserCredentials, UserFullDetails } from './user.model'
+import { SecuredUser, UserCredentials, UserFullDetails } from './user.model'
 
 export interface AuthResponse {
-  user: UserFullDetails
+  user: SecuredUser
   token: string
 }
 export interface LoginArgs {
@@ -11,3 +11,5 @@ export interface LoginArgs {
 export interface SignupArgs {
   credentials: UserFullDetails
 }
+
+export type AuthFields = Omit<UserFullDetails, 'fullName'>

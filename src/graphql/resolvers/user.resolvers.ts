@@ -10,8 +10,8 @@ export const userResolvers = {
         const securedUsers = users.map(userService.createSecuredUser)
         return securedUsers
       } catch (err) {
-        console.log('Had issues with loading users:', err)
-        logger.error(err)
+        logger.error('Had issues with loading users:', err)
+        throw new Error(`Failed fetching users: ${err}`)
       }
     },
 
@@ -21,8 +21,8 @@ export const userResolvers = {
         const securedUser = userService.createSecuredUser(user)
         return securedUser
       } catch (err) {
-        console.log('Had issues with loading user:', err)
-        logger.error(err)
+        logger.error('Had issues with loading user:', err)
+        throw new Error(`Failed fetching user with ID $${_id}: ${err}`)
       }
     },
   },
@@ -32,8 +32,8 @@ export const userResolvers = {
       try {
         await userService.remove(_id)
       } catch (err) {
-        console.log('Had issues with removing user:', err)
-        logger.error(err)
+        logger.error('Had issues with removing user:', err)
+        throw new Error(`Failed removing user with ID $${_id}: ${err}`)
       }
     },
 
@@ -43,8 +43,8 @@ export const userResolvers = {
         const securedUser = userService.createSecuredUser(updatedUser)
         return securedUser
       } catch (err) {
-        console.log('Had issues with updating user:', err)
-        logger.error(err)
+        logger.error('Had issues with updating user:', err)
+        throw new Error(`Failed update user: ${err}`)
       }
     },
   },

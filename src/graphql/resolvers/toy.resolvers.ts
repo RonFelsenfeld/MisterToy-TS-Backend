@@ -10,18 +10,18 @@ export const toyResolvers = {
         const toys = await toyService.query(filterBy, sortBy)
         return toys
       } catch (err) {
-        console.log('Had issues with loading toys:', err)
-        logger.error(err)
+        logger.error('Had issues with loading toys:', err)
+        throw new Error(`Failed fetching toys: ${err}`)
       }
     },
 
-    async toy(_: unknown, args: SingleToyArgs) {
+    async toy(_: unknown, { _id }: SingleToyArgs) {
       try {
-        const toy = await toyService.getById(args._id)
+        const toy = await toyService.getById(_id)
         return toy
       } catch (err) {
-        console.log('Had issues with loading toy:', err)
-        logger.error(err)
+        logger.error('Had issues with loading toy:', err)
+        throw new Error(`Failed fetching toy with ID ${_id}: ${err}`)
       }
     },
   },
@@ -31,8 +31,8 @@ export const toyResolvers = {
       try {
         await toyService.remove(_id)
       } catch (err) {
-        console.log('Had issues with removing toy:', err)
-        logger.error(err)
+        logger.error('Had issues with removing toy:', err)
+        throw new Error(`Failed removing toy with ID ${_id}: ${err}`)
       }
     },
 
@@ -41,8 +41,8 @@ export const toyResolvers = {
         const newToy = await toyService.add(toy)
         return newToy
       } catch (err) {
-        console.log('Had issues with adding toy:', err)
-        logger.error(err)
+        logger.error('Had issues with adding toy:', err)
+        throw new Error(`Failed adding toy: ${err}`)
       }
     },
 
@@ -51,8 +51,8 @@ export const toyResolvers = {
         const updatedToy = await toyService.update(toy as Toy)
         return updatedToy
       } catch (err) {
-        console.log('Had issues with updating toy:', err)
-        logger.error(err)
+        logger.error('Had issues with updating toy:', err)
+        throw new Error(`Failed updating toy: ${err}`)
       }
     },
   },

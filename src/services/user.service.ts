@@ -72,9 +72,15 @@ async function add(userInfo: UserFullDetails) {
   logger.debug('Adding new user:', userInfo)
 
   try {
+    const userToAdd: UserFullDetails = {
+      username: userInfo.username,
+      password: userInfo.password,
+      fullName: userInfo.fullName,
+    }
+
     const collection = await _getUserCollection()
-    const { insertedId } = await collection.insertOne(userInfo as User)
-    return { ...userInfo, _id: new ObjectId(insertedId) }
+    const { insertedId } = await collection.insertOne(userToAdd as User)
+    return { ...userToAdd, _id: new ObjectId(insertedId) } as User
   } catch (err) {
     logger.error('Cannot insert user', err)
     throw err
