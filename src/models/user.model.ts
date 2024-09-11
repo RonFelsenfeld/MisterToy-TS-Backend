@@ -6,14 +6,18 @@ interface UserCredentials {
   fullName?: string
 }
 
-export interface User extends Required<UserCredentials> {
+export type UserFullDetails = Required<UserCredentials>
+
+export interface User extends UserFullDetails {
   _id: ObjectId
 }
+
+export type SecuredUser = Omit<User, 'password'>
 
 export interface LoginArgs {
   credentials: UserCredentials
 }
 
 export interface SignupArgs {
-  credentials: Required<UserCredentials>
+  credentials: UserFullDetails
 }
