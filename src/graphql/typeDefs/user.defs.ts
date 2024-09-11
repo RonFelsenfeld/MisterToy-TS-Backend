@@ -12,33 +12,15 @@ type SecuredUser {
   fullName: String!
 }
 
-type AuthResponse {
-  user: SecuredUser!
-  token: String!
-}
-
 type Query {
   users: [SecuredUser]
   user(_id: ID!): SecuredUser
 }
 
 type Mutation {
-  login(credentials: LoginInput!): AuthResponse
-  signup(credentials:  SignupInput!): AuthResponse
   removeUser(_id: ID!): Boolean
   updateUser(user: UpdateUserInput!): SecuredUser
 }
-
-input LoginInput {
-  username: String!
-  password: String!
- }
-
- input SignupInput {
-  username: String!
-  password: String!
-  fullName: String!
- }
 
  input UpdateUserInput {
   _id: ID!

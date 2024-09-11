@@ -1,7 +1,7 @@
 // import bcrypt from 'bcrypt'
 import { userService } from '../../services/user.service'
 import { logger } from '../../services/logger.service'
-import { SingleUserArgs, LoginArgs, SignupArgs, UpdateUserArgs } from '../../models/user.model'
+import { SingleUserArgs, UpdateUserArgs } from '../../models/user.model'
 
 export const userResolvers = {
   Query: {
@@ -27,24 +27,6 @@ export const userResolvers = {
   },
 
   Mutation: {
-    async login(_: unknown, { credentials }: LoginArgs) {
-      console.log(credentials)
-    },
-
-    async signup(_: unknown, { credentials }: SignupArgs) {
-      // const { password } = credentials
-      // const hashedPassword = await bcrypt.hash(password, 10)
-      // console.log(`hashedPassword`, hashedPassword)
-      try {
-        const user = await userService.add(credentials)
-        const token = 'dddd'
-        return { token, user }
-      } catch (err) {
-        console.log('Had issues with adding user:', err)
-        logger.error(err)
-      }
-    },
-
     async removeUser(_: unknown, { _id }: SingleUserArgs) {
       try {
         await userService.remove(_id)

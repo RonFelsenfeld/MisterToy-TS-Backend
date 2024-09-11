@@ -11,6 +11,7 @@ export const userService = {
   remove,
   add,
   update,
+  createSecuredUser,
 }
 
 const usersCollectionName = process.env.USERS_COLLECTION_NAME!
@@ -21,7 +22,7 @@ async function query() {
   try {
     const collection = await _getUserCollection()
     const users = await collection.find().toArray()
-    const securedUsers: SecuredUser[] = users.map(_createSecuredUser)
+    const securedUsers: SecuredUser[] = users.map(createSecuredUser)
     return securedUsers
   } catch (err) {
     logger.error('Cannot fetch users', err)
@@ -37,7 +38,7 @@ async function getById(userId: string) {
     const user = await collection.findOne({ _id: new ObjectId(userId) })
     if (!user) throw new Error('User not found')
 
-    const securedUser = _createSecuredUser(user)
+    const securedUser = createSecuredUser(user)
     return securedUser
   } catch (err) {
     logger.error(`Cannot fetch user with ID: ${userId}`, err)
@@ -53,7 +54,7 @@ async function getByUsername(username: string) {
     const user = await collection.findOne({ username })
     if (!user) throw new Error('User not found')
 
-    const securedUser = _createSecuredUser(user)
+    const securedUser = createSecuredUser(user)
     return securedUser
   } catch (err) {
     logger.error(`Cannot fetch user with username: ${username}`, err)
@@ -79,7 +80,7 @@ async function add(userInfo: UserFullDetails) {
   try {
     const collection = await _getUserCollection()
     const { insertedId } = await collection.insertOne(userInfo as User)
-    const securedUser = _createSecuredUser({ ...userInfo, _id: insertedId })
+    const securedUser = createSecuredUser({ ...userInfo, _id: insertedId })
     return securedUser
   } catch (err) {
     logger.error('Cannot insert user', err)
@@ -101,11 +102,19 @@ async function update(user: User) {
     const collection = await _getUserCollection()
     await collection.updateOne({ _id: new ObjectId(user._id) }, { $set: userToSave })
 
-    const securedUser = _createSecuredUser(userToSave)
+    const securedUser = createSecuredUser(userToSave)
     return securedUser
   } catch (err) {
     logger.error(`Cannot update user ${user._id}`, err)
     throw err
+  }
+}
+
+function createSecuredUser(user: User): SecuredUser {
+  return {
+    _id: user._id,
+    username: user.username,
+    fullName: user.fullName,
   }
 }
 
@@ -115,12 +124,4 @@ async function update(user: User) {
 
 async function _getUserCollection() {
   return await dbService.getCollection<User>(usersCollectionName)
-}
-
-function _createSecuredUser(user: User): SecuredUser {
-  return {
-    _id: user._id,
-    username: user.username,
-    fullName: user.fullName,
-  }
 }

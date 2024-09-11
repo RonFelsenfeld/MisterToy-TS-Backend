@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 
-interface UserCredentials {
+export interface UserCredentials {
   username: string
   password: string
   fullName?: string
@@ -20,12 +20,4 @@ export interface SingleUserArgs {
 
 export interface UpdateUserArgs {
   user: User
-}
-
-export interface LoginArgs {
-  credentials: UserCredentials
-}
-
-export interface SignupArgs {
-  credentials: UserFullDetails
 }
