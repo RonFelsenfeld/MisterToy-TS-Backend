@@ -14,6 +14,7 @@ export const toyResolvers = {
         logger.error(err)
       }
     },
+
     async toy(_: unknown, args: SingleToyArgs) {
       try {
         const toy = await toyService.getById(args._id)
@@ -34,6 +35,7 @@ export const toyResolvers = {
         logger.error(err)
       }
     },
+
     async addToy(_: unknown, { toy }: SaveToyArgs) {
       try {
         const newToy = await toyService.add(toy)
@@ -43,6 +45,7 @@ export const toyResolvers = {
         logger.error(err)
       }
     },
+
     async updateToy(_: unknown, { toy }: SaveToyArgs) {
       try {
         const updatedToy = await toyService.update(toy as Toy)

@@ -20,7 +20,7 @@ async function query(filterBy?: ToyFilterBy, sortBy: Sort = {}) {
   try {
     const filterCriteria = _getFilterCriteria(filterBy)
 
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    const collection = await _getToysCollection()
     let toys = await collection.find(filterCriteria).sort(sortBy).toArray()
 
     return toys
@@ -34,7 +34,7 @@ async function getById(toyId: string) {
   logger.debug(`Fetching toy with ID: ${toyId}`)
 
   try {
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    const collection = await _getToysCollection()
     const toy = collection.findOne({ _id: new ObjectId(toyId) })
     return toy
   } catch (err) {
@@ -47,7 +47,7 @@ async function remove(toyId: string) {
   logger.debug(`Removing toy with ID: ${toyId}`)
 
   try {
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    const collection = await _getToysCollection()
     await collection.deleteOne({ _id: new ObjectId(toyId) })
   } catch (err) {
     logger.error(`Cannot remove toy ${toyId}`, err)
@@ -59,13 +59,11 @@ async function add(toy: Partial<Toy>) {
   logger.debug('Adding new toy:', toy)
 
   try {
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
-    await collection.insertOne(toy as Toy)
+    const collection = await _getToysCollection()
+    const { insertedId } = await collection.insertOne(toy as Toy)
 
-    const toyId = new ObjectId(toy._id)
-    toy.createdAt = toyId.getTimestamp().getTime()
-
-    await collection.updateOne({ _id: new ObjectId(toyId) }, { $set: toy })
+    toy.createdAt = insertedId.getTimestamp().getTime()
+    await collection.updateOne({ _id: new ObjectId(insertedId) }, { $set: toy })
     return toy
   } catch (err) {
     logger.error('cannot insert toy', err)
@@ -84,7 +82,7 @@ async function update(toy: Toy) {
       labels: [...toy.labels],
     }
 
-    const collection = await dbService.getCollection<Toy>(toysCollectionName)
+    const collection = await _getToysCollection()
     await collection.updateOne({ _id: new ObjectId(toy._id) }, { $set: toyToSave })
     return toy
   } catch (err) {
@@ -96,6 +94,10 @@ async function update(toy: Toy) {
 ////////////////////////////////////////////////////
 
 // ! Private Methods
+
+async function _getToysCollection() {
+  return await dbService.getCollection<Toy>(toysCollectionName)
+}
 
 function _getFilterCriteria(filterBy?: ToyFilterBy): Filter<Toy> {
   if (!filterBy) return {}

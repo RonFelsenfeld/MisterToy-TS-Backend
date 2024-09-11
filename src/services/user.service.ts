@@ -92,7 +92,7 @@ async function update(user: User) {
 
   try {
     const userToSave = {
-      _id: user._id,
+      _id: new ObjectId(user._id),
       username: user.username,
       password: user.password,
       fullName: user.fullName,
@@ -101,7 +101,7 @@ async function update(user: User) {
     const collection = await _getUserCollection()
     await collection.updateOne({ _id: new ObjectId(user._id) }, { $set: userToSave })
 
-    const securedUser = _createSecuredUser(user)
+    const securedUser = _createSecuredUser(userToSave)
     return securedUser
   } catch (err) {
     logger.error(`Cannot update user ${user._id}`, err)

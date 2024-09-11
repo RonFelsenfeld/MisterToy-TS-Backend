@@ -14,6 +14,14 @@ export interface User extends UserFullDetails {
 
 export type SecuredUser = Omit<User, 'password'>
 
+export interface SingleUserArgs {
+  _id: string
+}
+
+export interface UpdateUserArgs {
+  user: User
+}
+
 export interface LoginArgs {
   credentials: UserCredentials
 }

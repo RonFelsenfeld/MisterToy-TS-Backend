@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken'
 import { logger } from './logger.service'
-import { User } from '../models/user.model'
+import { User, UserFullDetails } from '../models/user.model'
+
+const JTW_KEY = process.env.JWT_SECRET_KEY!
 
 export const authService = {
   generateToken,
@@ -14,16 +16,16 @@ function generateToken(user: User) {
     fullName: user.fullName,
   }
 
-  const token = jwt.sign(userInfo, process.env.JWT_SECRET_KEY!)
+  const token = jwt.sign(userInfo, JTW_KEY)
   console.log(`TOKEN`, token)
   return token
 }
 
-function verifyToken(token: string): User | undefined {
+function verifyToken(token: string): UserFullDetails | undefined {
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET_KEY!)
+    const user = jwt.verify(token, JTW_KEY)
     console.log(`user`, user)
-    return user as User
+    return user as UserFullDetails
   } catch (err) {
     logger.error('Invalid token', err)
     throw err
