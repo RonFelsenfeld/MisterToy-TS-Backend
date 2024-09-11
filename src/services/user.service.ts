@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb'
-
 import { dbService } from './db.service'
 import { logger } from './logger.service'
 import { SecuredUser, User, UserFullDetails } from '../models/user.model'
@@ -22,8 +21,7 @@ async function query() {
   try {
     const collection = await _getUserCollection()
     const users = await collection.find().toArray()
-    const securedUsers: SecuredUser[] = users.map(createSecuredUser)
-    return securedUsers
+    return users
   } catch (err) {
     logger.error('Cannot fetch users', err)
     throw err
@@ -37,9 +35,7 @@ async function getById(userId: string) {
     const collection = await _getUserCollection()
     const user = await collection.findOne({ _id: new ObjectId(userId) })
     if (!user) throw new Error('User not found')
-
-    const securedUser = createSecuredUser(user)
-    return securedUser
+    return user
   } catch (err) {
     logger.error(`Cannot fetch user with ID: ${userId}`, err)
     throw err
@@ -53,9 +49,7 @@ async function getByUsername(username: string) {
     const collection = await _getUserCollection()
     const user = await collection.findOne({ username })
     if (!user) throw new Error('User not found')
-
-    const securedUser = createSecuredUser(user)
-    return securedUser
+    return user
   } catch (err) {
     logger.error(`Cannot fetch user with username: ${username}`, err)
     throw err
@@ -80,8 +74,7 @@ async function add(userInfo: UserFullDetails) {
   try {
     const collection = await _getUserCollection()
     const { insertedId } = await collection.insertOne(userInfo as User)
-    const securedUser = createSecuredUser({ ...userInfo, _id: insertedId })
-    return securedUser
+    return { ...userInfo, _id: new ObjectId(insertedId) }
   } catch (err) {
     logger.error('Cannot insert user', err)
     throw err
@@ -102,14 +95,14 @@ async function update(user: User) {
     const collection = await _getUserCollection()
     await collection.updateOne({ _id: new ObjectId(user._id) }, { $set: userToSave })
 
-    const securedUser = createSecuredUser(userToSave)
-    return securedUser
+    return userToSave
   } catch (err) {
     logger.error(`Cannot update user ${user._id}`, err)
     throw err
   }
 }
 
+// ! Returns the user without the password
 function createSecuredUser(user: User): SecuredUser {
   return {
     _id: user._id,

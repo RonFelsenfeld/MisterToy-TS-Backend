@@ -1,13 +1,22 @@
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+
 import { logger } from './logger.service'
-import { SecuredUser, User } from '../models/user.model'
+import { SecuredUser, User, UserFullDetails } from '../models/user.model'
 import { userService } from './user.service'
 
 const JTW_KEY = process.env.JWT_SECRET_KEY!
 
 export const authService = {
+  signup,
   generateToken,
   verifyToken,
+}
+
+async function signup({ username, password }: UserFullDetails) {
+  logger.debug(`Signup with username: ${username}`)
+
+  const securedUser = await userService.getByUsername(username)
 }
 
 function generateToken(user: User) {
