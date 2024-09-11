@@ -1,11 +1,7 @@
 import dotenv from 'dotenv'
-import { DBConfig } from '../models/db.model'
+import { createDBConfig } from '../models/db.model'
 
 dotenv.config()
 
-const configDev: DBConfig = {
-  dbURL: process.env.MONGO_COMPASS_URL!,
-  dbName: 'MisterToyDB',
-}
-
+const configDev = createDBConfig(process.env.MONGO_COMPASS_URL!)
 export default configDev

@@ -1,11 +1,7 @@
 import dotenv from 'dotenv'
-import { DBConfig } from '../models/db.model'
+import { createDBConfig } from '../models/db.model'
 
 dotenv.config()
 
-const configProd: DBConfig = {
-  dbURL: process.env.MONGO_CLOUD_URL!,
-  dbName: 'MisterToyDB',
-}
-
+const configProd = createDBConfig(process.env.MONGO_CLOUD_URL!)
 export default configProd
