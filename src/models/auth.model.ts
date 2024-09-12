@@ -11,5 +11,3 @@ export interface LoginArgs {
 export interface SignupArgs {
   credentials: UserFullDetails
 }
-
-export type AuthFields = Omit<UserFullDetails, 'fullName'>

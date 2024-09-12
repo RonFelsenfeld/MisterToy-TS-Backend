@@ -7,10 +7,10 @@ export const authResolvers = {
     async login(_: unknown, { credentials }: LoginArgs) {
       try {
         const { username, password } = credentials
-        const loginResponse = await authService.login({ username, password })
+        const loginResponse = await authService.login(username, password)
         return loginResponse
       } catch (err) {
-        const errMsg = `Failed to login ${err}`
+        const errMsg = `Failed to login: ${err}`
         logger.error(errMsg)
         throw new Error(errMsg)
       }
@@ -21,11 +21,11 @@ export const authResolvers = {
         const account = await authService.signup(credentials)
         logger.debug('New account created', JSON.stringify(account))
 
-        const { username, password } = account
-        const loginResponse = await authService.login({ username, password })
+        const { username, password } = credentials
+        const loginResponse = await authService.login(username, password)
         return loginResponse
       } catch (err) {
-        const errMsg = `Failed to signup ${err}`
+        const errMsg = `Failed to signup: ${err}`
         logger.error(errMsg)
         throw new Error(errMsg)
       }

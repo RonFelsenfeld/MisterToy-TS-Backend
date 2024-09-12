@@ -6,16 +6,37 @@ import { logger } from './logger.service'
 import { userService } from './user.service'
 
 import { SecuredUser, User, UserFullDetails } from '../models/user.model'
-import { AuthFields, AuthResponse } from '../models/auth.model'
+import { AuthResponse } from '../models/auth.model'
 
 export const authService = {
-  signup,
   login,
+  signup,
   verifyToken,
 }
 
 const JTW_SECRET_KEY = process.env.JWT_SECRET_KEY!
 const cryptoSecretKey = process.env.CRYPTO_SECRET_KEY!
+
+async function login(username: string, encryptedPassword: string): Promise<AuthResponse> {
+  logger.debug(`Logging-in with username: ${username}`)
+
+  try {
+    const user = await userService.getByUsername(username)
+    if (!user) return Promise.reject(`User not found with username: ${username}`)
+
+    const decryptedPassword = _decryptPassword(encryptedPassword)
+    const isMatch = await _isPasswordsMatch(decryptedPassword, user.password)
+    if (!isMatch) return Promise.reject('Passwords do not match')
+
+    // The passwords matches
+    const token = _generateToken(user)
+    const securedUser = userService.createSecuredUser(user)
+    return { token, user: securedUser }
+  } catch (err) {
+    logger.error('Cannot login', err)
+    throw err
+  }
+}
 
 async function signup(credentials: UserFullDetails) {
   logger.debug(`Signing-up with username: ${credentials.username}`)
@@ -24,32 +45,14 @@ async function signup(credentials: UserFullDetails) {
     const { isValid, error } = await _validateCredentials(credentials)
     if (!isValid) return Promise.reject(error)
 
-    const newUser = await userService.add(credentials)
+    const { password } = credentials
+    const decryptedPassword = _decryptPassword(password)
+    const hashedPassword = await _hashPassword(decryptedPassword)
+
+    const newUser = await userService.add({ ...credentials, password: hashedPassword })
     return newUser
   } catch (err) {
     logger.error('Cannot signup', err)
-    throw err
-  }
-}
-
-async function login({ username, password: encryptedPassword }: AuthFields): Promise<AuthResponse> {
-  logger.debug(`Logging-in with username: ${username}`)
-
-  try {
-    const user = await userService.getByUsername(username)
-    if (!user) return Promise.reject(`User not found with username: ${username}`)
-
-    const bytes = CryptoJS.AES.decrypt(encryptedPassword, cryptoSecretKey)
-    const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8)
-
-    const isMatch = await bcrypt.compare(decryptedPassword, user.password)
-    if (!isMatch) return Promise.reject('Passwords do not match')
-
-    const token = _generateToken(user)
-    const securedUser = userService.createSecuredUser(user)
-    return { token, user: securedUser }
-  } catch (err) {
-    logger.error('Cannot login', err)
     throw err
   }
 }
@@ -74,6 +77,7 @@ function _generateToken(user: User) {
   return token
 }
 
+// Validation
 interface ValidationInfo {
   isValid: boolean
   error?: string
@@ -96,6 +100,28 @@ function _isValidCredentials(credentials: UserFullDetails) {
 }
 
 async function _isExistingUsername(username: string) {
-  const existingUser = await userService.getByUsername(username)
-  return !!existingUser
+  try {
+    const existingUser = await userService.getByUsername(username)
+    return !!existingUser
+  } catch (err) {
+    logger.error(err)
+  }
+}
+
+// Password Encryption/Decryption
+
+async function _hashPassword(password: string, rounds: number = 10) {
+  const hashedPassword = await bcrypt.hash(password, rounds)
+  return hashedPassword
+}
+
+function _decryptPassword(encryptedPassword: string) {
+  const bytes = CryptoJS.AES.decrypt(encryptedPassword, cryptoSecretKey)
+  const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8)
+  return decryptedPassword
+}
+
+async function _isPasswordsMatch(password: string, hashedPassword: string) {
+  const isMatch = await bcrypt.compare(password, hashedPassword)
+  return isMatch
 }
