@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql'
 import { logger } from '../../services/logger.service'
 import { toyService } from '../../services/toy.service'
 
@@ -11,7 +12,7 @@ export const toyResolvers = {
         return toys
       } catch (err) {
         logger.error('Had issues with loading toys:', err)
-        throw new Error(`Failed fetching toys: ${err}`)
+        throw new GraphQLError(`Failed fetching toys: ${err}`)
       }
     },
 
@@ -21,7 +22,7 @@ export const toyResolvers = {
         return toy
       } catch (err) {
         logger.error('Had issues with loading toy:', err)
-        throw new Error(`Failed fetching toy with ID ${_id}: ${err}`)
+        throw new GraphQLError(`Failed fetching toy with ID ${_id}: ${err}`)
       }
     },
   },
@@ -32,7 +33,7 @@ export const toyResolvers = {
         await toyService.remove(_id)
       } catch (err) {
         logger.error('Had issues with removing toy:', err)
-        throw new Error(`Failed removing toy with ID ${_id}: ${err}`)
+        throw new GraphQLError(`Failed removing toy with ID ${_id}: ${err}`)
       }
     },
 
@@ -42,7 +43,7 @@ export const toyResolvers = {
         return newToy
       } catch (err) {
         logger.error('Had issues with adding toy:', err)
-        throw new Error(`Failed adding toy: ${err}`)
+        throw new GraphQLError(`Failed adding toy: ${err}`)
       }
     },
 
@@ -52,7 +53,7 @@ export const toyResolvers = {
         return updatedToy
       } catch (err) {
         logger.error('Had issues with updating toy:', err)
-        throw new Error(`Failed updating toy: ${err}`)
+        throw new GraphQLError(`Failed updating toy: ${err}`)
       }
     },
   },

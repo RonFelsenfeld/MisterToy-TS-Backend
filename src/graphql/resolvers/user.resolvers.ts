@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql'
 import { userService } from '../../services/user.service'
 import { logger } from '../../services/logger.service'
 import { SingleUserArgs, UpdateUserArgs } from '../../models/user.model'
@@ -11,7 +12,7 @@ export const userResolvers = {
         return securedUsers
       } catch (err) {
         logger.error('Had issues with loading users:', err)
-        throw new Error(`Failed fetching users: ${err}`)
+        throw new GraphQLError(`Failed fetching users: ${err}`)
       }
     },
 
@@ -22,7 +23,7 @@ export const userResolvers = {
         return securedUser
       } catch (err) {
         logger.error('Had issues with loading user:', err)
-        throw new Error(`Failed fetching user with ID $${_id}: ${err}`)
+        throw new GraphQLError(`Failed fetching user with ID $${_id}: ${err}`)
       }
     },
   },
@@ -33,7 +34,7 @@ export const userResolvers = {
         await userService.remove(_id)
       } catch (err) {
         logger.error('Had issues with removing user:', err)
-        throw new Error(`Failed removing user with ID $${_id}: ${err}`)
+        throw new GraphQLError(`Failed removing user with ID $${_id}: ${err}`)
       }
     },
 
@@ -44,7 +45,7 @@ export const userResolvers = {
         return securedUser
       } catch (err) {
         logger.error('Had issues with updating user:', err)
-        throw new Error(`Failed update user: ${err}`)
+        throw new GraphQLError(`Failed update user: ${err}`)
       }
     },
   },

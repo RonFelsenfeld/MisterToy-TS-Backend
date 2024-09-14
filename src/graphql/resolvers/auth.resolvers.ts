@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql'
 import { AuthResponse, LoginArgs, SignupArgs } from '../../models/auth.model'
 import { authService } from '../../services/auth.service'
 import { logger } from '../../services/logger.service'
@@ -12,7 +13,7 @@ export const authResolvers = {
       } catch (err) {
         const errMsg = `Failed to login: ${err}`
         logger.error(errMsg)
-        throw new Error(errMsg)
+        throw new GraphQLError(errMsg)
       }
     },
 
@@ -27,7 +28,7 @@ export const authResolvers = {
       } catch (err) {
         const errMsg = `Failed to signup: ${err}`
         logger.error(errMsg)
-        throw new Error(errMsg)
+        throw new GraphQLError(errMsg)
       }
     },
   },
