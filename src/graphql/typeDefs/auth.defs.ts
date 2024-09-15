@@ -7,6 +7,7 @@ type Mutation {
   login(credentials: LoginInput!): SecuredUser!
   signup(credentials:  SignupInput!): SecuredUser!
   logout: LogoutMsg!
+  fetchLoggedInUser: SecuredUser
 }
 
 input LoginInput {

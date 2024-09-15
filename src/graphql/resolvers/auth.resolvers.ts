@@ -45,10 +45,17 @@ const logout: Resolver<{ msg: string }> = async (_, _2, { res, user }) => {
   }
 }
 
+// ! Sending the logged in user to the client (can be undefined)
+const fetchLoggedInUser: Resolver<SecuredUser | undefined> = async (_, _2, { user }) => {
+  logger.debug('Fetching logged in user')
+  return user
+}
+
 export const authResolvers = {
   Mutation: {
     login,
     signup,
     logout,
+    fetchLoggedInUser,
   },
 }

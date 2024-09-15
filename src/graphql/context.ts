@@ -31,7 +31,7 @@ export async function context({ req, res }: ContextArgs): Promise<ServerContext>
       logger.info(`Logged-in user:`, securedUser)
       return { user: securedUser, res }
     } catch (err) {
-      console.log('Error while verifying token', err)
+      logger.error('Error while verifying token', err)
     }
   }
 
