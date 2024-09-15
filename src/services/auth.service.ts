@@ -12,6 +12,7 @@ import { AuthResponse } from '../models/auth.model'
 export const authService = {
   login,
   signup,
+  logout,
   getUserFromToken,
   applyTokenCookie,
 }
@@ -35,7 +36,6 @@ async function login(username: string, encryptedPassword: string): Promise<AuthR
     const securedUser = userService.createSecuredUser(user)
     return { token, user: securedUser }
   } catch (err) {
-    logger.error('Cannot login', err)
     throw err
   }
 }
@@ -54,12 +54,17 @@ async function signup(credentials: UserFullDetails) {
     const newUser = await userService.add({ ...credentials, password: hashedPassword })
     return newUser
   } catch (err) {
-    logger.error('Cannot signup', err)
     throw err
   }
 }
 
-// async function logout() {}
+async function logout(res: Response) {
+  try {
+    res.clearCookie('authToken')
+  } catch (err) {
+    throw err
+  }
+}
 
 async function getUserFromToken(token: string) {
   const jwtPayload = _verifyToken(token)

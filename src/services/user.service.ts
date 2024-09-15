@@ -23,7 +23,6 @@ async function query() {
     const users = await collection.find().toArray()
     return users
   } catch (err) {
-    logger.error('Cannot fetch users', err)
     throw err
   }
 }
@@ -37,7 +36,6 @@ async function getById(userId: string) {
     if (!user) throw new Error('User not found')
     return user
   } catch (err) {
-    logger.error(`Cannot fetch user with ID: ${userId}`, err)
     throw err
   }
 }
@@ -51,7 +49,6 @@ async function getByUsername(username: string) {
     if (!user) throw new Error('User not found')
     return user
   } catch (err) {
-    logger.error(`Cannot fetch user with username: ${username}`, err)
     throw err
   }
 }
@@ -63,7 +60,6 @@ async function remove(userId: string) {
     const collection = await _getUserCollection()
     await collection.deleteOne({ _id: new ObjectId(userId) })
   } catch (err) {
-    logger.error(`Cannot remove user ${userId}`, err)
     throw err
   }
 }
@@ -82,7 +78,6 @@ async function add(userInfo: UserFullDetails) {
     const { insertedId } = await collection.insertOne(userToAdd as User)
     return { ...userToAdd, _id: new ObjectId(insertedId) } as User
   } catch (err) {
-    logger.error('Cannot insert user', err)
     throw err
   }
 }
@@ -103,7 +98,6 @@ async function update(user: User) {
 
     return userToSave
   } catch (err) {
-    logger.error(`Cannot update user ${user._id}`, err)
     throw err
   }
 }

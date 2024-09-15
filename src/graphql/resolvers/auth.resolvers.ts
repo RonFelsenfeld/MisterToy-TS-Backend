@@ -30,14 +30,20 @@ const signup: Resolver<AuthResponse, SignupArgs> = async (_, { credentials }) =>
   }
 }
 
-// const logout: Resolver<null> = async () => {
-//   try {
-//   } catch (err) {}
-// }
+const logout: Resolver<{ msg: string }> = async (_, _2, { res, user }) => {
+  try {
+    await authService.logout(res)
+    logger.info(`User with id ${user?._id} logged out successfully`)
+    return { msg: 'Logged out successfully' }
+  } catch (err) {
+    throw utilService.handleError('Failed to logout', err as string)
+  }
+}
 
 export const authResolvers = {
   Mutation: {
     login,
     signup,
+    logout,
   },
 }

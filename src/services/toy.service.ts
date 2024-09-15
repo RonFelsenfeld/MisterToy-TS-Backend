@@ -25,7 +25,6 @@ async function query(filterBy?: ToyFilterBy, sortBy: Sort = {}) {
 
     return toys
   } catch (err) {
-    logger.error('Cannot fetch toys', err)
     throw err
   }
 }
@@ -38,7 +37,6 @@ async function getById(toyId: string) {
     const toy = collection.findOne({ _id: new ObjectId(toyId) })
     return toy
   } catch (err) {
-    logger.error(`Cannot fetch toy with ID: ${toyId}`, err)
     throw err
   }
 }
@@ -50,7 +48,6 @@ async function remove(toyId: string) {
     const collection = await _getToysCollection()
     await collection.deleteOne({ _id: new ObjectId(toyId) })
   } catch (err) {
-    logger.error(`Cannot remove toy ${toyId}`, err)
     throw err
   }
 }
@@ -66,7 +63,6 @@ async function add(toy: Partial<Toy>) {
     await collection.updateOne({ _id: new ObjectId(insertedId) }, { $set: toy })
     return toy as Toy
   } catch (err) {
-    logger.error('cannot insert toy', err)
     throw err
   }
 }
@@ -86,7 +82,6 @@ async function update(toy: Toy) {
     await collection.updateOne({ _id: new ObjectId(toy._id) }, { $set: toyToSave })
     return toy
   } catch (err) {
-    logger.error(`Cannot update toy ${toy._id}`, err)
     throw err
   }
 }
