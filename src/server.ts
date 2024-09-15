@@ -8,8 +8,9 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import path from 'path'
 
-import { schema } from './graphql/schema'
 import { logger } from './services/logger.service'
+import { schema } from './graphql/schema'
+import { ServerContext, context } from './graphql/context'
 
 const app = express()
 const httpServer = http.createServer(app)
@@ -31,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(cors(corsOptions))
 }
 
-const server = new ApolloServer({
+const server = new ApolloServer<ServerContext>({
   ...schema,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 })
@@ -46,7 +47,7 @@ async function initServer() {
   await server.start()
 
   app.use(bodyParser.json())
-  app.use(expressMiddleware(server))
+  app.use(expressMiddleware(server, { context }))
   app.use(cookieParser())
 
   const port = process.env.PORT || 4000

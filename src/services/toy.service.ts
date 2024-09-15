@@ -64,7 +64,7 @@ async function add(toy: Partial<Toy>) {
 
     toy.createdAt = insertedId.getTimestamp().getTime()
     await collection.updateOne({ _id: new ObjectId(insertedId) }, { $set: toy })
-    return toy
+    return toy as Toy
   } catch (err) {
     logger.error('cannot insert toy', err)
     throw err
