@@ -3,28 +3,33 @@ import { logger } from '../../services/logger.service'
 import { utilService } from '../../services/util.service'
 
 import { Resolver } from '../../models/resolver.model'
-import { AuthResponse, LoginArgs, SignupArgs } from '../../models/auth.model'
+import { LoginArgs, SignupArgs } from '../../models/auth.model'
+import { SecuredUser } from '../../models/user.model'
 
-const login: Resolver<AuthResponse, LoginArgs> = async (_, { credentials }, { res }) => {
+const login: Resolver<SecuredUser, LoginArgs> = async (_, { credentials }, { res }) => {
   try {
     const { username, password } = credentials
-    const loginResponse = await authService.login(username, password)
+    const { user, token } = await authService.login(username, password)
+    logger.info(`User with id ${user._id} logged in successfully`)
 
-    authService.applyTokenCookie(res, loginResponse.token)
-    return loginResponse
+    authService.applyTokenCookie(res, token)
+    return user
   } catch (err) {
     throw utilService.handleError('Failed to login', err as string)
   }
 }
 
-const signup: Resolver<AuthResponse, SignupArgs> = async (_, { credentials }) => {
+const signup: Resolver<SecuredUser, SignupArgs> = async (_, { credentials }, { res }) => {
   try {
     const account = await authService.signup(credentials)
     logger.debug('New account created', JSON.stringify(account))
 
     const { username, password } = credentials
-    const loginResponse = await authService.login(username, password)
-    return loginResponse
+    const { user, token } = await authService.login(username, password)
+
+    logger.info(`User with id ${user._id} logged in successfully`)
+    authService.applyTokenCookie(res, token)
+    return user
   } catch (err) {
     throw utilService.handleError('Failed to signup', err as string)
   }

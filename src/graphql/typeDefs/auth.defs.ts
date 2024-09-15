@@ -1,16 +1,11 @@
 export const authDefs = `#graphql
-type AuthResponse {
-  user: SecuredUser!
-  token: String!
-}
-
 type LogoutMsg {
   msg: String!
 }
 
 type Mutation {
-  login(credentials: LoginInput!): AuthResponse
-  signup(credentials:  SignupInput!): AuthResponse
+  login(credentials: LoginInput!): SecuredUser!
+  signup(credentials:  SignupInput!): SecuredUser!
   logout: LogoutMsg!
 }
 

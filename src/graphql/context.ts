@@ -23,7 +23,7 @@ export async function context({ req, res }: ContextArgs): Promise<ServerContext>
       const user = await authService.getUserFromToken(token)
 
       if (!user) {
-        logger.debug('THERE IS NO USER IN TOKEN')
+        logger.debug('FROM CONTEXT -> THERE IS NO USER IN TOKEN')
         throw new Error('Could not get user from token')
       }
 
@@ -35,5 +35,6 @@ export async function context({ req, res }: ContextArgs): Promise<ServerContext>
     }
   }
 
+  logger.debug('FROM CONTEXT -> NO LOGGED IN USER')
   return { res }
 }
