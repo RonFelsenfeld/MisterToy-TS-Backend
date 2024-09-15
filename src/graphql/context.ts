@@ -18,7 +18,7 @@ export async function context({ req, res }: ContextArgs): Promise<ServerContext>
 
   if (token) {
     try {
-      token = token.split('=')[1] // Extracting the token from headers
+      token = token.split('=')[1] // ! Extracting the token from headers
       const user = await authService.getUserFromToken(token)
       if (!user) throw new Error('Could not get user from token')
 

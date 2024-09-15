@@ -1,6 +1,5 @@
-import { GraphQLError } from 'graphql'
+import { utilService } from '../../services/util.service'
 import { userService } from '../../services/user.service'
-import { logger } from '../../services/logger.service'
 
 import { SecuredUser, SingleUserArgs, UpdateUserArgs } from '../../models/user.model'
 import { Resolver } from '../../models/resolver.model'
@@ -11,8 +10,7 @@ const users: Resolver<SecuredUser[]> = async () => {
     const securedUsers = users.map(userService.createSecuredUser)
     return securedUsers
   } catch (err) {
-    logger.error('Had issues with loading users:', err)
-    throw new GraphQLError(`Failed fetching users: ${err}`)
+    throw utilService.handleError('Failed fetching users', err as string)
   }
 }
 
@@ -22,8 +20,7 @@ const user: Resolver<SecuredUser, SingleUserArgs> = async (_, { _id }) => {
     const securedUser = userService.createSecuredUser(user)
     return securedUser
   } catch (err) {
-    logger.error('Had issues with loading user:', err)
-    throw new GraphQLError(`Failed fetching user with ID $${_id}: ${err}`)
+    throw utilService.handleError(`Failed fetching user with ID $${_id}`, err as string)
   }
 }
 
@@ -31,8 +28,7 @@ const removeUser: Resolver<void, SingleUserArgs> = async (_, { _id }) => {
   try {
     await userService.remove(_id)
   } catch (err) {
-    logger.error('Had issues with removing user:', err)
-    throw new GraphQLError(`Failed removing user with ID $${_id}: ${err}`)
+    throw utilService.handleError(`Failed removing user with ID $${_id}`, err as string)
   }
 }
 
@@ -42,8 +38,7 @@ const updateUser: Resolver<SecuredUser, UpdateUserArgs> = async (_, { user }) =>
     const securedUser = userService.createSecuredUser(updatedUser)
     return securedUser
   } catch (err) {
-    logger.error('Had issues with updating user:', err)
-    throw new GraphQLError(`Failed update user: ${err}`)
+    throw utilService.handleError('Failed update user', err as string)
   }
 }
 

@@ -1,6 +1,6 @@
-import { GraphQLError } from 'graphql'
 import { authService } from '../../services/auth.service'
 import { logger } from '../../services/logger.service'
+import { utilService } from '../../services/util.service'
 
 import { Resolver } from '../../models/resolver.model'
 import { AuthResponse, LoginArgs, SignupArgs } from '../../models/auth.model'
@@ -13,9 +13,7 @@ const login: Resolver<AuthResponse, LoginArgs> = async (_, { credentials }, { re
     authService.applyTokenCookie(res, loginResponse.token)
     return loginResponse
   } catch (err) {
-    const errMsg = `Failed to login: ${err}`
-    logger.error(errMsg)
-    throw new GraphQLError(errMsg)
+    throw utilService.handleError('Failed to login', err as string)
   }
 }
 
@@ -28,11 +26,14 @@ const signup: Resolver<AuthResponse, SignupArgs> = async (_, { credentials }) =>
     const loginResponse = await authService.login(username, password)
     return loginResponse
   } catch (err) {
-    const errMsg = `Failed to signup: ${err}`
-    logger.error(errMsg)
-    throw new GraphQLError(errMsg)
+    throw utilService.handleError('Failed to signup', err as string)
   }
 }
+
+// const logout: Resolver<null> = async () => {
+//   try {
+//   } catch (err) {}
+// }
 
 export const authResolvers = {
   Mutation: {

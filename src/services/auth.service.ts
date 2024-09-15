@@ -59,6 +59,8 @@ async function signup(credentials: UserFullDetails) {
   }
 }
 
+// async function logout() {}
+
 async function getUserFromToken(token: string) {
   const jwtPayload = _verifyToken(token)
   const { _id } = jwtPayload
