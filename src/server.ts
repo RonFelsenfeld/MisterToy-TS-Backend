@@ -46,9 +46,9 @@ initServer()
 async function initServer() {
   await server.start()
 
+  app.use(cookieParser())
   app.use(bodyParser.json())
   app.use(expressMiddleware(server, { context }))
-  app.use(cookieParser())
 
   const port = process.env.PORT || 4000
   httpServer.listen({ port })

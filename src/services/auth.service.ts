@@ -1,17 +1,19 @@
 import CryptoJS from 'crypto-js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { Response } from 'express'
 
 import { logger } from './logger.service'
 import { userService } from './user.service'
 
-import { SecuredUser, User, UserFullDetails } from '../models/user.model'
+import { User, UserFullDetails } from '../models/user.model'
 import { AuthResponse } from '../models/auth.model'
 
 export const authService = {
   login,
   signup,
-  verifyToken,
+  getUserFromToken,
+  applyTokenCookie,
 }
 
 const JTW_SECRET_KEY = process.env.JWT_SECRET_KEY!
@@ -57,24 +59,44 @@ async function signup(credentials: UserFullDetails) {
   }
 }
 
-function verifyToken(token: string): SecuredUser | void {
-  try {
-    const user = jwt.verify(token, JTW_SECRET_KEY)
-    return user as SecuredUser
-  } catch (err) {
-    logger.error('Invalid token', err)
-    throw err
-  }
+async function getUserFromToken(token: string) {
+  const jwtPayload = _verifyToken(token)
+  const { _id } = jwtPayload
+  if (!_id) throw new Error('Could not verify token')
+
+  const user = await userService.getById(_id)
+  if (!user) throw new Error('User not found in token')
+
+  return user
+}
+
+function applyTokenCookie(res: Response, token: string, expiredAt?: number) {
+  res.cookie('authToken', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+    maxAge: expiredAt || 1000 * 60 * 60 * 24, // 1 day
+  })
 }
 
 ////////////////////////////////////////////////////
 
 // ! Private Methods
 
-function _generateToken(user: User) {
-  const userInfo = userService.createSecuredUser(user)
-  const token = jwt.sign(userInfo, JTW_SECRET_KEY)
+// Token
+function _generateToken({ _id }: User) {
+  const token = jwt.sign({ _id }, JTW_SECRET_KEY)
   return token
+}
+
+function _verifyToken(token: string) {
+  try {
+    const jwtPayload = jwt.verify(token, JTW_SECRET_KEY)
+    return jwtPayload as { _id: string }
+  } catch (err) {
+    logger.error('Invalid token', err)
+    throw err
+  }
 }
 
 // Validation
