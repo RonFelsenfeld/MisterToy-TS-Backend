@@ -6,7 +6,7 @@ import { Response } from 'express'
 import { logger } from './logger.service'
 import { userService } from './user.service'
 
-import { User, UserFullCredentials } from '../models/user.model'
+import { SecuredUser, User, UserFullCredentials } from '../models/user.model'
 import { AuthResponse } from '../models/auth.model'
 
 export const authService = {
@@ -15,6 +15,7 @@ export const authService = {
   logout,
   getUserFromToken,
   applyTokenCookie,
+  isAuthorized,
 }
 
 const JTW_SECRET_KEY = process.env.JWT_SECRET_KEY!
@@ -84,6 +85,10 @@ function applyTokenCookie(res: Response, token: string, expiredAt?: number) {
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: expiredAt || 1000 * 60 * 60 * 24, // 1 day
   })
+}
+
+function isAuthorized(user: SecuredUser | undefined) {
+  return user && user.isAdmin
 }
 
 ////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 import { toyService } from '../../services/toy.service'
 import { utilService } from '../../services/util.service'
+import { authMiddleware } from '../../middlewares/auth.middleware'
 
 import { Toy, SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../models/toy.model'
 import { Resolver } from '../../models/resolver.model'
@@ -55,8 +56,8 @@ export const toyResolvers = {
   },
 
   Mutation: {
-    removeToy,
-    addToy,
-    updateToy,
+    removeToy: authMiddleware(removeToy),
+    addToy: authMiddleware(addToy),
+    updateToy: authMiddleware(updateToy),
   },
 }

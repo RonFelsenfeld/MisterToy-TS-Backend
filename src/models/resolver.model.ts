@@ -9,3 +9,7 @@ export interface Resolver<ReturnType, ArgsType = null> {
     info: GraphQLResolveInfo
   ): Promise<ReturnType>
 }
+
+export interface AuthMiddleware<T, U> {
+  (resolver: Resolver<T, U>): Resolver<T, U>
+}
