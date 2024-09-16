@@ -6,7 +6,7 @@ import { Response } from 'express'
 import { logger } from './logger.service'
 import { userService } from './user.service'
 
-import { User, UserFullDetails } from '../models/user.model'
+import { User, UserFullCredentials } from '../models/user.model'
 import { AuthResponse } from '../models/auth.model'
 
 export const authService = {
@@ -40,12 +40,12 @@ async function login(username: string, encryptedPassword: string): Promise<AuthR
   }
 }
 
-async function signup(credentials: UserFullDetails) {
+async function signup(credentials: UserFullCredentials) {
   logger.debug(`Signing-up with username: ${credentials.username}`)
 
   try {
     const { isValid, error } = await _validateCredentials(credentials)
-    if (!isValid) return Promise.reject(error)
+    if (!isValid) throw new Error(error)
 
     const { password } = credentials
     const decryptedPassword = _decryptPassword(password)
@@ -112,7 +112,7 @@ interface ValidationInfo {
   error?: string
 }
 
-async function _validateCredentials(credentials: UserFullDetails): Promise<ValidationInfo> {
+async function _validateCredentials(credentials: UserFullCredentials): Promise<ValidationInfo> {
   if (!_isValidCredentials(credentials)) {
     return { isValid: false, error: 'Missing credentials' }
   }
@@ -124,7 +124,7 @@ async function _validateCredentials(credentials: UserFullDetails): Promise<Valid
   return { isValid: true }
 }
 
-function _isValidCredentials(credentials: UserFullDetails) {
+function _isValidCredentials(credentials: UserFullCredentials) {
   return !!credentials.username && !!credentials.password && !!credentials.fullName
 }
 

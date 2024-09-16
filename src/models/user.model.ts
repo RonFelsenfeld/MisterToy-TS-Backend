@@ -6,7 +6,11 @@ export interface UserCredentials {
   fullName?: string
 }
 
-export type UserFullDetails = Required<UserCredentials>
+export type UserFullCredentials = Required<UserCredentials>
+
+export interface UserFullDetails extends UserFullCredentials {
+  isAdmin: boolean
+}
 
 export interface User extends UserFullDetails {
   _id: ObjectId

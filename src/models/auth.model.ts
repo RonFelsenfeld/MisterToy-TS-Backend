@@ -1,4 +1,4 @@
-import { SecuredUser, UserCredentials, UserFullDetails } from './user.model'
+import { SecuredUser, UserCredentials, UserFullCredentials } from './user.model'
 
 export interface AuthResponse {
   user: SecuredUser
@@ -9,5 +9,5 @@ export interface LoginArgs {
 }
 
 export interface SignupArgs {
-  credentials: UserFullDetails
+  credentials: UserFullCredentials
 }

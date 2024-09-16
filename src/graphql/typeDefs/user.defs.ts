@@ -4,12 +4,14 @@ type User {
   username: String!
   password: String!
   fullName: String!
+  isAdmin: Boolean!
 }
 
 type SecuredUser {
   _id: ID!
   username: String!
   fullName: String!
+  isAdmin: Boolean!
 }
 
 type Query {
@@ -27,5 +29,6 @@ type Mutation {
   username: String!
   password: String!
   fullName: String!
+  isAdmin: Boolean!
  }
 `

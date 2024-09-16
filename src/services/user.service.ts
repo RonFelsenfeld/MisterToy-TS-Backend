@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 import { dbService } from './db.service'
 import { logger } from './logger.service'
-import { SecuredUser, User, UserFullDetails } from '../models/user.model'
+import { SecuredUser, User, UserFullCredentials, UserFullDetails } from '../models/user.model'
 
 export const userService = {
   query,
@@ -64,7 +64,7 @@ async function remove(userId: string) {
   }
 }
 
-async function add(userInfo: UserFullDetails) {
+async function add(userInfo: UserFullCredentials) {
   logger.debug('Adding new user:', userInfo)
 
   try {
@@ -72,6 +72,7 @@ async function add(userInfo: UserFullDetails) {
       username: userInfo.username,
       password: userInfo.password,
       fullName: userInfo.fullName,
+      isAdmin: false, // Default to false for new users
     }
 
     const collection = await _getUserCollection()
@@ -91,6 +92,7 @@ async function update(user: User) {
       username: user.username,
       password: user.password,
       fullName: user.fullName,
+      isAdmin: user.isAdmin,
     }
 
     const collection = await _getUserCollection()
@@ -108,6 +110,7 @@ function createSecuredUser(user: User): SecuredUser {
     _id: user._id,
     username: user.username,
     fullName: user.fullName,
+    isAdmin: user.isAdmin,
   }
 }
 
