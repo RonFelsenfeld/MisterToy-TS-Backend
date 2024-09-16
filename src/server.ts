@@ -16,7 +16,7 @@ const app = express()
 const httpServer = http.createServer(app)
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.resolve('/public')))
+  app.use(express.static(path.resolve('public')))
 } else {
   const corsOptions = {
     origin: [
@@ -38,7 +38,7 @@ const server = new ApolloServer<ServerContext>({
 })
 
 app.get('/**', (_, res) => {
-  res.sendFile(path.resolve('/public/index.html'))
+  res.sendFile(path.resolve('public/index.html'))
 })
 
 initServer()
