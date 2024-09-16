@@ -16,7 +16,7 @@ const app = express()
 const httpServer = http.createServer(app)
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.resolve('public')))
+  app.use(express.static(path.resolve('../public')))
 } else {
   const corsOptions = {
     origin: [
