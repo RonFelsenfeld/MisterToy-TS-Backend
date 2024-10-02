@@ -6,6 +6,13 @@ type Toy {
   labels: [String!]!
   createdAt: Float!
   inStock: Boolean!
+  msgs: [ToyMsg!]!
+}
+
+type ToyMsg {
+  id: ID!
+  txt: String!
+  by: MiniUser!
 }
 
 type Query {

@@ -14,6 +14,11 @@ type SecuredUser {
   isAdmin: Boolean!
 }
 
+type MiniUser {
+  _id: ID!
+  fullName: String!
+}
+
 type Query {
   users: [SecuredUser]
   user(_id: ID!): SecuredUser
