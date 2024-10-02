@@ -9,6 +9,7 @@ import {
   SingleToyArgs,
   AddToyMsgArgs,
   ToyMsg,
+  RemoveToyMsgArgs,
 } from '../../models/toy.model'
 import { Resolver } from '../../models/resolver.model'
 
@@ -69,6 +70,14 @@ const addToyMsg: Resolver<ToyMsg, AddToyMsgArgs> = async (_, { toyId, msg: txt }
   }
 }
 
+const removeToyMsg: Resolver<void, RemoveToyMsgArgs> = async (_, { toyId, msgId }) => {
+  try {
+    await toyService.removeMsg(toyId, msgId)
+  } catch (err) {
+    throw utilService.handleError('Failed removing msg from toy', err as string)
+  }
+}
+
 export const toyResolvers = {
   Query: {
     toys,
@@ -80,5 +89,6 @@ export const toyResolvers = {
     addToy: adminMiddleware(addToy),
     updateToy: adminMiddleware(updateToy),
     addToyMsg: authMiddleware(addToyMsg),
+    removeToyMsg: adminMiddleware(removeToyMsg),
   },
 }

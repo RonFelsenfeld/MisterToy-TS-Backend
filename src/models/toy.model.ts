@@ -43,3 +43,8 @@ export interface AddToyMsgArgs {
   toyId: string
   msg: string
 }
+
+export interface RemoveToyMsgArgs {
+  toyId: string
+  msgId: string
+}

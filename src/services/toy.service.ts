@@ -12,6 +12,7 @@ export const toyService = {
   add,
   update,
   addMsg,
+  removeMsg,
 }
 
 const toysCollectionName = process.env.TOYS_COLLECTION_NAME!
@@ -101,6 +102,16 @@ async function addMsg(toyId: string, msg: ToyMsg) {
   }
 }
 
+async function removeMsg(toyId: string, msgId: string) {
+  logger.debug(`Removing msg (${msgId}) from toy ${toyId}`)
+
+  try {
+    const collection = await _getToysCollection()
+    await collection.updateOne({ _id: new ObjectId(toyId) }, { $pull: { msgs: { id: msgId } } })
+  } catch (err) {
+    throw err
+  }
+}
 ////////////////////////////////////////////////////
 
 // ! Private Methods
