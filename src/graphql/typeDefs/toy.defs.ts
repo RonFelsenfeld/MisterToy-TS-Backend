@@ -24,6 +24,7 @@ type Mutation {
   removeToy(_id: ID!): Boolean
   addToy(toy: AddToyInput!): Toy
   updateToy(toy: UpdateToyInput!): Toy
+  addToyMsg(toyId: ID!, msg: String!): ToyMsg
 }
 
 input FilterByInput {

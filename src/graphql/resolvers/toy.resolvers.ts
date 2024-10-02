@@ -1,9 +1,18 @@
 import { toyService } from '../../services/toy.service'
 import { utilService } from '../../services/util.service'
-import { authMiddleware } from '../../middlewares/auth.middleware'
+import { adminMiddleware } from '../../middlewares/admin.middleware'
 
-import { Toy, SaveToyArgs, QueryToysArgs, SingleToyArgs } from '../../models/toy.model'
+import {
+  Toy,
+  SaveToyArgs,
+  QueryToysArgs,
+  SingleToyArgs,
+  AddToyMsgArgs,
+  ToyMsg,
+} from '../../models/toy.model'
 import { Resolver } from '../../models/resolver.model'
+
+import { authMiddleware } from '../../middlewares/auth.middleware'
 
 const toys: Resolver<Toy[], QueryToysArgs> = async (_, { filterBy, sortBy }) => {
   try {
@@ -49,6 +58,17 @@ const updateToy: Resolver<Toy, SaveToyArgs> = async (_, { toy }) => {
   }
 }
 
+const addToyMsg: Resolver<ToyMsg, AddToyMsgArgs> = async (_, { toyId, msg: txt }, { user }) => {
+  try {
+    const { _id, fullName } = user! // Resolver is protected by authMiddleware, so there is a user for sure
+    const msgToSave = { txt, by: { _id, fullName } }
+    const savedMsg = await toyService.addMsg(toyId, msgToSave as ToyMsg)
+    return savedMsg
+  } catch (err) {
+    throw utilService.handleError('Failed adding msg to toy', err as string)
+  }
+}
+
 export const toyResolvers = {
   Query: {
     toys,
@@ -56,8 +76,9 @@ export const toyResolvers = {
   },
 
   Mutation: {
-    removeToy: authMiddleware(removeToy),
-    addToy: authMiddleware(addToy),
-    updateToy: authMiddleware(updateToy),
+    removeToy: adminMiddleware(removeToy),
+    addToy: adminMiddleware(addToy),
+    updateToy: adminMiddleware(updateToy),
+    addToyMsg: authMiddleware(addToyMsg),
   },
 }

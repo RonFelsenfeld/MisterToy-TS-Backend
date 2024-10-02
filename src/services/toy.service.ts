@@ -2,7 +2,8 @@ import { Filter, ObjectId, Sort } from 'mongodb'
 
 import { logger } from './logger.service'
 import { dbService } from './db.service'
-import { Toy, ToyFilterBy } from '../models/toy.model'
+import { Toy, ToyFilterBy, ToyMsg } from '../models/toy.model'
+import { utilService } from './util.service'
 
 export const toyService = {
   query,
@@ -10,6 +11,7 @@ export const toyService = {
   remove,
   add,
   update,
+  addMsg,
 }
 
 const toysCollectionName = process.env.TOYS_COLLECTION_NAME!
@@ -81,6 +83,19 @@ async function update(toy: Toy) {
     const collection = await _getToysCollection()
     await collection.updateOne({ _id: new ObjectId(toy._id) }, { $set: toyToSave })
     return toy
+  } catch (err) {
+    throw err
+  }
+}
+
+async function addMsg(toyId: string, msg: ToyMsg) {
+  logger.debug(`Adding msg (${msg.txt}) to toy ${toyId}`)
+
+  try {
+    msg.id = utilService.makeId()
+    const collection = await _getToysCollection()
+    await collection.updateOne({ _id: new ObjectId(toyId) }, { $push: { msgs: msg } })
+    return msg
   } catch (err) {
     throw err
   }

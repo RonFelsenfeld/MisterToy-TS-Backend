@@ -1,4 +1,5 @@
 import { ObjectId, Sort } from 'mongodb'
+import { User } from './user.model'
 
 // TODO: Refactor interfaces
 
@@ -9,6 +10,13 @@ export interface Toy {
   labels: string[]
   createdAt: number
   inStock: boolean
+  msgs: ToyMsg[]
+}
+
+export interface ToyMsg {
+  id: string
+  txt: string
+  by: Pick<User, '_id' | 'fullName'>
 }
 
 export interface ToyFilterBy {
@@ -29,4 +37,9 @@ export interface SaveToyArgs {
 export interface QueryToysArgs {
   filterBy?: ToyFilterBy
   sortBy?: Sort
+}
+
+export interface AddToyMsgArgs {
+  toyId: string
+  msg: string
 }
