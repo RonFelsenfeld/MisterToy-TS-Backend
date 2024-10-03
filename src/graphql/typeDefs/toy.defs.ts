@@ -46,6 +46,7 @@ input AddToyInput {
   price: Float!,
   labels: [String!]!
   inStock: Boolean!
+  msgs: [ToyMsgInput]!
 }
 
 input UpdateToyInput {
@@ -55,5 +56,12 @@ input UpdateToyInput {
   labels: [String!]!,
   createdAt: Float!,
   inStock: Boolean!
+  msgs: [ToyMsgInput!]!
+}
+
+input ToyMsgInput {
+  id: ID!
+  txt: String!
+  by: MiniUserInput!
 }
 `

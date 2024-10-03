@@ -36,4 +36,9 @@ type Mutation {
   fullName: String!
   isAdmin: Boolean!
  }
+
+input MiniUserInput {
+  _id: ID!
+  fullName: String!
+}
 `
