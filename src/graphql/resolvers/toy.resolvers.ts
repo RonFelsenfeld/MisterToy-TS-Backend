@@ -1,6 +1,8 @@
 import { toyService } from '../../services/toy.service'
 import { utilService } from '../../services/util.service'
+
 import { adminMiddleware } from '../../middlewares/admin.middleware'
+import { authMiddleware } from '../../middlewares/auth.middleware'
 
 import {
   Toy,
@@ -12,8 +14,6 @@ import {
   RemoveToyMsgArgs,
 } from '../../models/toy.model'
 import { Resolver } from '../../models/resolver.model'
-
-import { authMiddleware } from '../../middlewares/auth.middleware'
 
 const toys: Resolver<Toy[], QueryToysArgs> = async (_, { filterBy, sortBy }) => {
   try {
