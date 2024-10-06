@@ -79,10 +79,11 @@ async function getUserFromToken(token: string) {
 }
 
 function applyTokenCookie(res: Response, token: string, expiredAt?: number) {
+  const isProduction = process.env.NODE_ENV === 'production'
   res.cookie('authToken', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: expiredAt || 1000 * 60 * 60 * 24, // 1 day
   })
 }
