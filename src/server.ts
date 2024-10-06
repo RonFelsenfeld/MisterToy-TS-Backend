@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { ApolloServerPluginCacheControlDisabled } from '@apollo/server/plugin/disabled'
 import cookieParser from 'cookie-parser'
 import express from 'express'
 
@@ -35,7 +36,10 @@ if (process.env.NODE_ENV === 'production') {
 
 const server = new ApolloServer<ServerContext>({
   ...schema,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  plugins: [
+    ApolloServerPluginCacheControlDisabled(),
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+  ],
 })
 
 // app.get('/**', (_, res) => {
